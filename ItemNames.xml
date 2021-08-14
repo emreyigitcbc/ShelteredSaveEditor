@@ -1,0 +1,295 @@
+<root>
+  <item_51>Good Bulletproof vest</item_51>
+  <item_52>Great Bulletproof vest</item_52>
+  <item_47>Poor Bulletproof vest</item_47>
+  <item_801>Alternator</item_801>
+  <item_802>Car Battery</item_802>
+  <item_806>Clutch Cable</item_806>
+  <item_800>Distributor</item_800>
+  <item_804>Fan belt</item_804>
+  <item_808>Saddle</item_808>
+  <item_803>Spark plug</item_803>
+  <item_807>Starter Motor</item_807>
+  <item_805>Tyre</item_805>
+  <item_100>Food ration</item_100>
+  <item_97>Advanced Gas Mask</item_97>
+  <item_63>Alfalfa</item_63>
+  <item_64>Aloe Vera</item_64>
+  <item_103>Animal Fat</item_103>
+  <item_101>Animal Repellent</item_101>
+  <item_25>Battery</item_25>
+  <item_92>Bed Roll</item_92>
+  <item_49>Binoculars</item_49>
+  <item_65>Holy Basil</item_65>
+  <item_18>Book</item_18>
+  <item_1302>Briefcase</item_1302>
+  <item_135>Broken Baseball Bat</item_135>
+  <item_136>Broken Crowbar</item_136>
+  <item_137>Broken Hatchet</item_137>
+  <item_138>Broken Knife</item_138>
+  <item_139>Broken Knuckleduster</item_139>
+  <item_140>Broken Pipe</item_140>
+  <item_121>Broken Pistol</item_121>
+  <item_76>Broken Radio</item_76>
+  <item_141>Broken Rebar</item_141>
+  <item_122>Broken Rifle</item_122>
+  <item_123>Broken Shotgun</item_123>
+  <item_84>Broken TV</item_84>
+  <item_142>Broken Wood</item_142>
+  <item_33>Bucket</item_33>
+  <item_30>Bulb</item_30>
+  <item_75>Burnt Clothes</item_75>
+  <item_83>Burnt Out Laptop</item_83>
+  <item_88>Camouflage</item_88>
+  <item_94>Carrier Bag</item_94>
+  <item_43>Cement</item_43>
+  <item_29>Circuit Board</item_29>
+  <item_28>Circuit Breaker</item_28>
+  <item_21>Coal</item_21>
+  <item_96>Coffee Beans</item_96>
+  <item_39>Cordite</item_39>
+  <item_124>Corroded Battery</item_124>
+  <item_129>Damaged Teddy Bear</item_129>
+  <item_86>Desperate Meat</item_86>
+  <item_4>Duct Tape</item_4>
+  <item_66>Echinacea</item_66>
+  <item_104>Embryo</item_104>
+  <item_91>Empty Petrol Can</item_91>
+  <item_126>Fertilizer</item_126>
+  <item_26>Fuse</item_26>
+  <item_67>Garlic</item_67>
+  <item_54>Gas Mask</item_54>
+  <item_62>Holy Basil</item_62>
+  <item_78>Glass Jar</item_78>
+  <item_127>Hacking Terminal</item_127>
+  <item_12>Hinge</item_12>
+  <item_46>Large rucksack</item_46>
+  <item_903>Laser Cell</item_903>
+  <item_13>Leather</item_13>
+  <item_42>Lens</item_42>
+  <item_41>Lighter</item_41>
+  <item_38>Limestone</item_38>
+  <item_90>Lockpick Set</item_90>
+  <item_77>Log</item_77>
+  <item_40>Magnesium</item_40>
+  <item_82>Mannequin Arm</item_82>
+  <item_81>Mannequin Head</item_81>
+  <item_80>Mannequin Leg</item_80>
+  <item_20>Matches</item_20>
+  <item_85>Meat</item_85>
+  <item_6>Metal</item_6>
+  <item_50>Metal detector</item_50>
+  <item_87>Metal Ore</item_87>
+  <item_98>Military Rucksack</item_98>
+  <item_89>Motion Detector</item_89>
+  <item_31>Motor</item_31>
+  <item_44>Nail Bomb</item_44>
+  <item_7>Nail</item_7>
+  <item_1303>Note</item_1303>
+  <item_14>Nylon</item_14>
+  <item_61>Oak Bark</item_61>
+  <item_128>Old Soap</item_128>
+  <item_57>Paint can</item_57>
+  <item_58>Passion Flower</item_58>
+  <item_2>Petrol Can</item_2>
+  <item_1301>Photograph</item_1301>
+  <item_900>Pistol Ammo</item_900>
+  <item_34>Plastic</item_34>
+  <item_74>Plastic Bottle</item_74>
+  <item_95>Prospectors Kit</item_95>
+  <item_68>Raw Honey</item_68>
+  <item_17>Record</item_17>
+  <item_902>Rifle Ammo</item_902>
+  <item_35>Rope</item_35>
+  <item_36>Rubber</item_36>
+  <item_45>Rucksack</item_45>
+  <item_130>Ruined Leather</item_130>
+  <item_131>Rusted Lighter</item_131>
+  <item_132>Rusted Nail</item_132>
+  <item_37>Sand</item_37>
+  <item_15>Satchel</item_15>
+  <item_79>Scrap Pile</item_79>
+  <item_53>Seeds</item_53>
+  <item_901>Shotgun Ammo</item_901>
+  <item_99>Soap</item_99>
+  <item_9>Spring</item_9>
+  <item_59>St. John's Wort</item_59>
+  <item_32>Switch</item_32>
+  <item_93>Tent</item_93>
+  <item_19>Toy</item_19>
+  <item_24>Transistor</item_24>
+  <item_48>Trip wire</item_48>
+  <item_11>Valve</item_11>
+  <item_27>Wiring</item_27>
+  <item_8>Wool</item_8>
+  <item_134>Worm Husk</item_134>
+  <item_60>Yellow Jasmine</item_60>
+  <item_102>Adrenalin</item_102>
+  <item_22>Antibiotics</item_22>
+  <item_16>Anti-Radiation Tablets</item_16>
+  <item_73>Bandages</item_73>
+  <item_125>Expired Antibiotics</item_125>
+  <item_3>First Aid Kit</item_3>
+  <item_69>Homemade Antibiotic</item_69>
+  <item_72>Homemade Antidepressant</item_72>
+  <item_70>Homemade Antiemetic</item_70>
+  <item_71>Homemade Anti-Radiation Tablets</item_71>
+  <item_133>Used Bandages</item_133>
+  <item_23>Relaxants</item_23>
+  <item_358>Ammunition Press</item_358>
+  <item_371>Paint Can Trap</item_371>
+  <item_373>Rifle Sentry Trap</item_373>
+  <item_369>Shotgun Trap</item_369>
+  <item_370>Spike Trap</item_370>
+  <item_304>Comfy Bunk Bed</item_304>
+  <item_327>Comfy Bed</item_327>
+  <item_328>Luxury Bunk Bed</item_328>
+  <item_321>Bed</item_321>
+  <item_326>Sleeping Bag</item_326>
+  <item_300>Bookshelf</item_300>
+  <item_375>CCTV Camera</item_375>
+  <item_306>Chair</item_306>
+  <item_374>Coffee Machine</item_374>
+  <item_311>object.cot (debug?)</item_311>
+  <item_378>Cryo-chamber (debug?)</item_378>
+  <item_376>Defibrillator</item_376>
+  <item_318>Land mine (debug)</item_318>
+  <item_367>Fire Extinguisher</item_367>
+  <item_323>Grave</item_323>
+  <item_366>Hiding Spot</item_366>
+  <item_356>Incinerator</item_356>
+  <item_380>Item Fabricator</item_380>
+  <item_357>Laboratory</item_357>
+  <item_322>Land mine (debug)</item_322>
+  <item_365>Large Freezer</item_365>
+  <item_372>Makeshift Recycler</item_372>
+  <item_364>Medium Freezer</item_364>
+  <item_324>Map &amp; Bucket</item_324>
+  <item_359>Painting</item_359>
+  <item_341>Auto Pantry</item_341>
+  <item_340>Large Pantry</item_340>
+  <item_339>Medium Pantry</item_339>
+  <item_338>Small Pantry</item_338>
+  <item_337>Tiny Pantry</item_337>
+  <item_302>Jukebox</item_302>
+  <item_314>Planter</item_314>
+  <item_310>Punchbag</item_310>
+  <item_354>Sturdy Punch Bag (debug)</item_354>
+  <item_320>Rat Trap</item_320>
+  <item_361>Recycling Plant</item_361>
+  <item_360>Sculpture</item_360>
+  <item_335>Efficient Shower</item_335>
+  <item_334>Good Shower</item_334>
+  <item_336>Luxury Shower</item_336>
+  <item_333>Makeshift Shower</item_333>
+  <item_363>Small Freezer</item_363>
+  <item_317>Snare Trap</item_317>
+  <item_353>Advanced Snare Trap</item_353>
+  <item_352>Moderate Snare Trap</item_352>
+  <item_325>Solar Panel</item_325>
+  <item_319>Spike Trap (debug)</item_319>
+  <item_368>Stable</item_368>
+  <item_348>Large Crate</item_348>
+  <item_312>Storage Locker (debug)</item_312>
+  <item_347>Medium Crate</item_347>
+  <item_346>Small Crate</item_346>
+  <item_351>Excellent Stove</item_351>
+  <item_307>Good Stove</item_307>
+  <item_349>Poor Stove</item_349>
+  <item_309>Makeshift Toilet</item_309>
+  <item_329>Bucket Toilet</item_329>
+  <item_331>Efficient Toilet</item_331>
+  <item_330>Good Toilet</item_330>
+  <item_332>Luxury Toilet</item_332>
+  <item_308>Toy Box</item_308>
+  <item_377>Wardrobe</item_377>
+  <item_313>Small Water Butt</item_313>
+  <item_344>Auto Water Butt</item_344>
+  <item_343>Large Water Butt</item_343>
+  <item_342>Medium Water Butt</item_342>
+  <item_362>Water Condenser</item_362>
+  <item_113>Aluminium Composite</item_113>
+  <item_118>Coolant</item_118>
+  <item_120>Nano Electronics</item_120>
+  <item_119>Nickel Alloy</item_119>
+  <item_116>Reinforced Carbon</item_116>
+  <item_115>Valve Assembly</item_115>
+  <item_117>Thermal Tiles</item_117>
+  <item_114>Titanium Alloy</item_114>
+  <item_111>Bay Cover A</item_111>
+  <item_112>Bay Cover B</item_112>
+  <item_106>Booster Cylinder</item_106>
+  <item_109>Core Compartment Panel</item_109>
+  <item_105>Engine Chassis</item_105>
+  <item_110>Heat Exchange Panel</item_110>
+  <item_107>Injection Cylinder</item_107>
+  <item_108>Main Booster</item_108>
+  <item_1201>Auto Pantry Schematic</item_1201>
+  <item_1202>Auto Water Butt Schematic</item_1202>
+  <item_1209>Flash Knife Schematic</item_1209>
+  <item_1207>Knuckle Dusters Of Might Schematic</item_1207>
+  <item_1210>Librarian's Crowbar Schematic</item_1210>
+  <item_1206>Lucky Lucky Bat Schematic</item_1206>
+  <item_1204>Luxury Bunk Bed Schematic</item_1204>
+  <item_1205>Luxury Shower Schematic</item_1205>
+  <item_1203>Luxury Toilet Schematic</item_1203>
+  <item_1208>Rebar Of Confidence Schematic</item_1208>
+  <item_1200>Test-schematic (debug)</item_1200>
+  <item_1001>Ladder (installed?)</item_1001>
+  <item_1002>Light (installed?)</item_1002>
+  <item_1100>Red Paint</item_1100>
+  <item_1109>Paint Stripper</item_1109>
+  <item_1101>Green Paint</item_1101>
+  <item_1102>Blue Paint</item_1102>
+  <item_1103>Yellow Paint</item_1103>
+  <item_1104>Orange Paint</item_1104>
+  <item_1105>Purple Paint</item_1105>
+  <item_1106>Pink Paint</item_1106>
+  <item_1107>Turquoise Paint</item_1107>
+  <item_1108>White Paint</item_1108>
+  <item_1000>Shelter Room (installed?)</item_1000>
+  <item_405>Chisel</item_405>
+  <item_404>Drill</item_404>
+  <item_400>Hammer</item_400>
+  <item_403>Hand saw</item_403>
+  <item_406>Nail gun</item_406>
+  <item_402>Pliers</item_402>
+  <item_408>Ratchet</item_408>
+  <item_407>Sander</item_407>
+  <item_401>Screwdriver</item_401>
+  <item_409>Wrench</item_409>
+  <item_201>Water?</item_201>
+  <item_200>Water?</item_200>
+  <item_607>Baseball Bat</item_607>
+  <item_650>fists (debug?)</item_650>
+  <item_601>Crowbar</item_601>
+  <item_653>fists (debug?)</item_653>
+  <item_600>fists (debug?)</item_600>
+  <item_702>Flashbang</item_702>
+  <item_615>Flash Knife</item_615>
+  <item_700>Grenade</item_700>
+  <item_604>Hatchet</item_604>
+  <item_605>Knife</item_605>
+  <item_608>Knuckle duster</item_608>
+  <item_613>Knuckle Dusters of Might</item_613>
+  <item_617>Laser Pistol</item_617>
+  <item_618>Laser Rifle</item_618>
+  <item_619>Laser Shotgun</item_619>
+  <item_616>Librarian's Crowbar</item_616>
+  <item_612>Lucky Lucky Bat</item_612>
+  <item_670>M16</item_670>
+  <item_701>Pipe Bomb</item_701>
+  <item_704>Excellent Pipe Bomb</item_704>
+  <item_703>Poor Pipe Bomb</item_703>
+  <item_10>Pipe</item_10>
+  <item_609>Pistol</item_609>
+  <item_602>Rebar</item_602>
+  <item_614>Rebar Of Confidence</item_614>
+  <item_611>Rifle</item_611>
+  <item_606>Rock</item_606>
+  <item_610>Shotgun</item_610>
+  <item_603>Sledgehammer</item_603>
+  <item_652>fists (debug?)</item_652>
+  <item_5>Wood</item_5>
+  <item_654>fists (debug?)</item_654>
+</root>
