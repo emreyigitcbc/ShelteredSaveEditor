@@ -11,9 +11,9 @@ using System.Xml;
 
 namespace ShelteredSE
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
         }
@@ -24,11 +24,11 @@ namespace ShelteredSE
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            label1.Left = (this.ClientSize.Width - label1.Size.Width) / 2;
-            button1.Left = (this.ClientSize.Width - button1.Size.Width) / 2;
+            label_welcome.Left = (this.ClientSize.Width - label_welcome.Size.Width) / 2;
+            button_upload.Left = (this.ClientSize.Width - button_upload.Size.Width) / 2;
 
-            panel1.Show();
-            tabControl1.Hide();
+            panel_welcome.Show();
+            editorSelector.Hide();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -40,8 +40,8 @@ namespace ShelteredSE
                 if (decodedData != string.Empty)
                 {
                     // Open editor
-                    panel1.Hide();
-                    tabControl1.Show();
+                    panel_welcome.Hide();
+                    editorSelector.Show();
                     xmlDoc.LoadXml(decodedData);
                     itemNames.Load("ItemNames.xml");
                     ProcessData processData = new ProcessData(this);
@@ -54,8 +54,9 @@ namespace ShelteredSE
             }
         }
 
-        private void saveData()
+        public void saveData()
         {
+            saveFileDialog.FileName = ProcessFile.fileName;
             DialogResult result = saveFileDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
@@ -78,11 +79,11 @@ namespace ShelteredSE
 
         private void listView2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listView2.SelectedIndices.Count <= 0)
+            if (listView_saveInfo.SelectedIndices.Count <= 0)
             {
                 return;
             }
-            int selectedIndex = listView2.SelectedIndices[0];
+            int selectedIndex = listView_saveInfo.SelectedIndices[0];
             if (selectedIndex >= 0)
             {
                 ProcessData processData = new ProcessData(this);
@@ -92,16 +93,51 @@ namespace ShelteredSE
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listView1.SelectedIndices.Count <= 0)
+            if (listView_inventory.SelectedIndices.Count <= 0)
             {
                 return;
             }
-            int selectedIndex = listView1.SelectedIndices[0];
+            int selectedIndex = listView_inventory.SelectedIndices[0];
             if (selectedIndex >= 0)
             {
                 ProcessData processData = new ProcessData(this);
                 processData.PaintInventoryManager(selectedIndex);
             }
+        }
+
+        private void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (treeView_character.SelectedNode == null)
+            {
+                return;
+            }
+            string selectedNode = treeView_character.SelectedNode.ToolTipText;
+            Console.WriteLine(selectedNode);
+            if (selectedNode != string.Empty)
+            {
+                ProcessData processData = new ProcessData(this);
+                processData.PaintFamilyMembers(selectedNode);
+            }
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (treeView_tree.SelectedNode == null)
+            {
+                return;
+            }
+            TreeNode selectedNode = treeView_tree.SelectedNode;
+            if (selectedNode != null)
+            {
+                ProcessData processData = new ProcessData(this);
+                processData.PaintTreeEditor(selectedNode);
+            }
+        }
+
+        private void button_save_Click(object sender, EventArgs e)
+        {
+            ProcessData processData = new ProcessData(this);
+            processData.StartSave();
         }
     }
 }

@@ -120,6 +120,16 @@
   <metadata name="openSaveFile.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="richTextBox1.Text" xml:space="preserve">
+    <value>If you typed wrong value to  specific fields or you changed something that you shouldn't have changed your save file may break.
+If you don't want to lose your all progress, backup your save file first!
+
+Change process works in this order:
+- First it saves the changes that made in "Tree Editor"
+- Then it saves the changes that made in "Character Editor", "Inventory Editor", "Save Info".
+
+If you changed same value in Tree Editor and in other editors, the changes you made in Tree Editor will be overwritten by the other editors.</value>
+  </data>
   <metadata name="saveFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>140, 17</value>
   </metadata>

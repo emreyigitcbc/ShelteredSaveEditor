@@ -9,11 +9,12 @@ namespace ShelteredSE
 {
     class ProcessFile
     {
-        public string tempFilePath = string.Empty;
-
+        public static string tempFilePath = string.Empty;
+        public static string fileName = string.Empty;
         public string LoadFile(string filePath)
         {
             string data = string.Empty;
+            fileName = Path.GetFileName(filePath);
             if (!File.Exists(filePath))
             {
                 return "";
