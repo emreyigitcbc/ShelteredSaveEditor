@@ -7,7 +7,8 @@
 - Editing everything (Tree Editor)
 - Show mystery hatch password & enable mystery hatch
 
-
+**Warning**
+- This is not compatible with Sheltered 2, use this instead: [mjra/Sheltered-2-SE (github.com)](https://github.com/mjra/Sheltered-2-SE)
 
 **Usage:**
 
