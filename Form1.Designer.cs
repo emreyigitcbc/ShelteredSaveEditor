@@ -1,4 +1,4 @@
-﻿namespace ShelteredSE
+namespace ShelteredSE
 {
     partial class MainForm
     {
@@ -453,7 +453,7 @@
         private System.Windows.Forms.TabPage characterTab;
         public System.Windows.Forms.TreeView treeView_tree;
         public System.Windows.Forms.TableLayoutPanel tableLayout_saveInfo;
-        private System.Windows.Forms.TableLayoutPanel tableLayout_inventory;
+        public System.Windows.Forms.TableLayoutPanel tableLayout_inventory;
         public System.Windows.Forms.ListView listView_inventory;
         public System.Windows.Forms.ListView listView_saveInfo;
         public System.Windows.Forms.Panel panel_saveInfo;

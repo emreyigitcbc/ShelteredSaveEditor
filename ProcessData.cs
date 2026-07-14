@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,11 +27,148 @@ namespace ShelteredSE
         public static List<(string Name, string Path)> familyMap = new List<(string Name, string Path)> { };
         public static List<(string Name, string Path)> treeMap = new List<(string Name, string Path)> { };
 
+        public static Dictionary<int, string> itemNamesByIndex = new Dictionary<int, string>();
+        public static Dictionary<string, string> itemNamesByTypeId = new Dictionary<string, string>();
+
+        public class CsvItemInfo
+        {
+            public string TypeId { get; set; }
+            public int Index { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+
+        public static Dictionary<int, CsvItemInfo> csvItemsByIndex = new Dictionary<int, CsvItemInfo>();
+        public static Dictionary<string, CsvItemInfo> csvItemsByTypeId = new Dictionary<string, CsvItemInfo>();
+        public static List<ListViewItem> allInventoryListViewItems = new List<ListViewItem>();
+
+        public static void LoadItemNames()
+        {
+            csvItemsByIndex.Clear();
+            csvItemsByTypeId.Clear();
+
+            string csvPath = "Sheltered - Item #.csv";
+            if (File.Exists(csvPath))
+            {
+                try
+                {
+                    var lines = File.ReadAllLines(csvPath);
+                    foreach (var line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+                        var parts = line.Split(',');
+                        if (parts.Length >= 3)
+                        {
+                            var typeStr = parts[0].Trim();
+                            var indexStr = parts[1].Trim();
+                            var nameStr = parts[2].Trim();
+
+                            if (typeStr == "type" || indexStr == "i#") continue; // Skip header
+
+                            List<string> notes = new List<string>();
+                            for (int j = 3; j < parts.Length; j++)
+                            {
+                                var note = parts[j].Trim();
+                                if (!string.IsNullOrEmpty(note)) notes.Add(note);
+                            }
+                            var descStr = string.Join(" | ", notes);
+
+                            var info = new CsvItemInfo
+                            {
+                                TypeId = typeStr,
+                                Name = nameStr,
+                                Description = descStr
+                            };
+
+                            if (int.TryParse(indexStr, out int idx))
+                            {
+                                info.Index = idx;
+                                csvItemsByIndex[idx] = info;
+                            }
+                            if (!string.IsNullOrEmpty(typeStr))
+                            {
+                                csvItemsByTypeId[typeStr] = info;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error reading CSV: " + ex.Message);
+                }
+            }
+        }
+
+        private Control CreateInputControl(string initialValue, string name, Point location)
+        {
+            if (initialValue.Equals("True", System.StringComparison.OrdinalIgnoreCase) || 
+                initialValue.Equals("False", System.StringComparison.OrdinalIgnoreCase))
+            {
+                var comboBox = new ComboBox()
+                {
+                    Name = name,
+                    Location = location,
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Width = 100
+                };
+                comboBox.Items.Add("True");
+                comboBox.Items.Add("False");
+                comboBox.Text = initialValue.Equals("True", System.StringComparison.OrdinalIgnoreCase) ? "True" : "False";
+                return comboBox;
+            }
+            else
+            {
+                var textBox = new TextBox()
+                {
+                    Text = initialValue,
+                    Name = name,
+                    Location = location,
+                    AutoSize = true
+                };
+
+                double dummyDouble;
+                int dummyInt;
+                if (double.TryParse(initialValue, out dummyDouble) || int.TryParse(initialValue, out dummyInt))
+                {
+                    textBox.KeyPress += (sender, e) =>
+                    {
+                        char decimalSeparator = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
+                        char minusSign = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NegativeSign[0];
+
+                        if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) &&
+                            (e.KeyChar != decimalSeparator) && (e.KeyChar != minusSign))
+                        {
+                            e.Handled = true;
+                        }
+
+                        if ((e.KeyChar == decimalSeparator) && ((sender as TextBox).Text.IndexOf(decimalSeparator) > -1))
+                        {
+                            e.Handled = true;
+                        }
+
+                        if ((e.KeyChar == minusSign) && ((sender as TextBox).Text.IndexOf(minusSign) > -1 || (sender as TextBox).SelectionStart > 0))
+                        {
+                            e.Handled = true;
+                        }
+                    };
+                }
+
+                return textBox;
+            }
+        }
+
         public void StartProcess()
         {
             xmlData = form1.xmlDoc.FirstChild;
             xmlNames = form1.itemNames.FirstChild;
             if (xmlData.Name != "root") return;
+
+            // Clear static map buffers to prevent duplicates when reloading saves
+            inventoryMap.Clear();
+            saveInfoMap.Clear();
+            familyMap.Clear();
+            treeMap.Clear();
+
             // SAVE INFO PROCESSING
             SProcess(xmlData.SelectSingleNode("SaveInfo"));
             // INVENTORY PROCESSING
@@ -39,23 +177,168 @@ namespace ShelteredSE
             CProcess(form1.treeView_character.Nodes, xmlData.SelectSingleNode("FamilyMembers"));
             // TREE EDITOR PROCESSING
             TProcess(form1.treeView_tree.Nodes, xmlData);
-
         }
         // INVENTORY PROCESSING
         public void IProcess(XmlNode invMan)
         {
             int counter = 0;
+            allInventoryListViewItems.Clear();
+            form1.listView_inventory.Items.Clear();
+
+            // Set Column 0 of tableLayout_inventory to 450 pixels absolute so that columns and search bar are fully visible!
+            if (form1.tableLayout_inventory.ColumnStyles.Count > 0)
+            {
+                form1.tableLayout_inventory.ColumnStyles[0] = new ColumnStyle(SizeType.Absolute, 450F);
+            }
+
+            // Set up multi-column view
+            form1.listView_inventory.Columns.Clear();
+            form1.listView_inventory.Columns.Add("Name", 170);
+            form1.listView_inventory.Columns.Add("ID", 50);
+            form1.listView_inventory.Columns.Add("Description", 200);
+            form1.listView_inventory.HeaderStyle = ColumnHeaderStyle.Clickable;
+
             foreach (XmlNode node in invMan)
             {
-                var realId = node.ChildNodes[0].InnerText;
-                var realName = xmlNames.SelectSingleNode("item_" + realId).InnerText;
-                var count = node.ChildNodes[1].InnerText;
+                var realId = node.SelectSingleNode("type")?.InnerText ?? (node.ChildNodes.Count > 0 ? node.ChildNodes[0].InnerText : "");
+                var count = node.SelectSingleNode("count")?.InnerText ?? (node.ChildNodes.Count > 1 ? node.ChildNodes[1].InnerText : "");
+
+                string realName = null;
+                string description = "";
+                if (node.Name.StartsWith("i") && int.TryParse(node.Name.Substring(1), out int slotIdx))
+                {
+                    if (csvItemsByIndex.TryGetValue(slotIdx, out var info))
+                    {
+                        realName = info.Name;
+                        description = info.Description;
+                    }
+                }
+                if (string.IsNullOrEmpty(realName))
+                {
+                    if (csvItemsByTypeId.TryGetValue(realId, out var info))
+                    {
+                        realName = info.Name;
+                        description = info.Description;
+                    }
+                }
+                if (string.IsNullOrEmpty(realName))
+                {
+                    realName = "Undefined Item (" + realId + ")";
+                }
+
                 inventoryMap.Add(("InventoryManager_" + counter.ToString() + "_textbox", "InventoryManager/inventory/" + node.Name + "/count"));
-                form1.listView_inventory.Items.Add(new ListViewItem() { Text = realName });
+                
+                var lvi = new ListViewItem(realName) { Tag = counter };
+                lvi.SubItems.Add(realId);
+                lvi.SubItems.Add(description);
+
+                allInventoryListViewItems.Add(lvi);
+                form1.listView_inventory.Items.Add(lvi);
                 counter += 1;
             }
             form1.listView_inventory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+
+            InitializeSearchBar();
         }
+
+        private void InitializeSearchBar()
+        {
+            form1.BeginInvoke((MethodInvoker)delegate
+            {
+                var parent = form1.listView_inventory.Parent;
+                if (parent != null && parent.Name != "searchContainerPanel")
+                {
+                    TableLayoutPanel searchContainer = new TableLayoutPanel()
+                    {
+                        Name = "searchContainerPanel",
+                        Dock = DockStyle.Fill,
+                        RowCount = 2,
+                        ColumnCount = 1
+                    };
+                    searchContainer.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
+                    searchContainer.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+                    Panel searchBarPanel = new Panel()
+                    {
+                        Dock = DockStyle.Fill,
+                        Margin = new Padding(0)
+                    };
+
+                    Label searchLabel = new Label()
+                    {
+                        Text = "Search:",
+                        Location = new Point(3, 8),
+                        Size = new Size(55, 20),
+                        TextAlign = ContentAlignment.MiddleLeft
+                    };
+
+                    TextBox searchBox = new TextBox()
+                    {
+                        Name = "textBox_searchInventory",
+                        Location = new Point(60, 5),
+                        Width = 380
+                    };
+
+                    searchBox.TextChanged += (sender, e) =>
+                    {
+                        FilterInventoryList(searchBox.Text);
+                    };
+
+                    searchBarPanel.Controls.Add(searchLabel);
+                    searchBarPanel.Controls.Add(searchBox);
+
+                    int col = 0, row = 0;
+                    if (parent is TableLayoutPanel tlp)
+                    {
+                        col = tlp.GetColumn(form1.listView_inventory);
+                        row = tlp.GetRow(form1.listView_inventory);
+                        tlp.Controls.Remove(form1.listView_inventory);
+                    }
+                    else
+                    {
+                        parent.Controls.Remove(form1.listView_inventory);
+                    }
+
+                    searchContainer.Controls.Add(searchBarPanel, 0, 0);
+                    searchContainer.Controls.Add(form1.listView_inventory, 0, 1);
+
+                    if (parent is TableLayoutPanel tlp2)
+                    {
+                        tlp2.Controls.Add(searchContainer, col, row);
+                    }
+                    else
+                    {
+                        parent.Controls.Add(searchContainer);
+                    }
+                }
+            });
+        }
+
+        private void FilterInventoryList(string query)
+        {
+            form1.listView_inventory.BeginUpdate();
+            form1.listView_inventory.Items.Clear();
+
+            var filtered = allInventoryListViewItems;
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                query = query.Trim();
+                filtered = allInventoryListViewItems.Where(item =>
+                    item.Text.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 || 
+                    item.SubItems[1].Text.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 || 
+                    item.SubItems[2].Text.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                ).ToList();
+            }
+
+            foreach (var item in filtered)
+            {
+                form1.listView_inventory.Items.Add(item);
+            }
+
+            form1.listView_inventory.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+            form1.listView_inventory.EndUpdate();
+        }
+
         // INVENTORY PAINTER
         public void PaintInventoryManager(int index)
         {
@@ -68,11 +351,36 @@ namespace ShelteredSE
             {
                 selectedControls[0].Show();
                 form1.panel_inventory.Controls.Find("InventoryManager_" + index.ToString() + "_label", false)[0].Show();
+
+                var idLabel = form1.panel_inventory.Controls.Find("InventoryManager_" + index.ToString() + "_idLabel", false);
+                if (idLabel.Length > 0) idLabel[0].Show();
+                var descLabel = form1.panel_inventory.Controls.Find("InventoryManager_" + index.ToString() + "_descLabel", false);
+                if (descLabel.Length > 0) descLabel[0].Show();
             }
             else
             {
-                form1.panel_inventory.Controls.Add(new Label() { Text = form1.listView_inventory.Items[index].Text, Name = "InventoryManager_" + index.ToString() + "_label", Location = new Point(10, 10), AutoSize = true });
-                form1.panel_inventory.Controls.Add(new TextBox() { Text = xmlData.SelectSingleNode(inventoryMap[index].Path).InnerText, Name = "InventoryManager_" + index.ToString() + "_textbox", Location = new Point(200, 10), AutoSize = true });
+                string displayName = "Unknown Item";
+                string realId = "Unknown";
+                string description = "";
+
+                foreach (ListViewItem item in allInventoryListViewItems)
+                {
+                    if (item.Tag is int tagIdx && tagIdx == index)
+                    {
+                        displayName = item.Text;
+                        realId = item.SubItems[1].Text;
+                        description = item.SubItems[2].Text;
+                        break;
+                    }
+                }
+
+                form1.panel_inventory.Controls.Add(new Label() { Text = displayName, Name = "InventoryManager_" + index.ToString() + "_label", Location = new Point(10, 10), AutoSize = true, Font = new Font(form1.Font, FontStyle.Bold) });
+                form1.panel_inventory.Controls.Add(new Label() { Text = "ID: " + realId, Name = "InventoryManager_" + index.ToString() + "_idLabel", Location = new Point(10, 35), AutoSize = true });
+                form1.panel_inventory.Controls.Add(new Label() { Text = "Description: " + description, Name = "InventoryManager_" + index.ToString() + "_descLabel", Location = new Point(10, 60), AutoSize = true, MaximumSize = new Size(450, 0) });
+
+                var initialValue = xmlData.SelectSingleNode(inventoryMap[index].Path).InnerText;
+                var inputCtrl = CreateInputControl(initialValue, "InventoryManager_" + index.ToString() + "_textbox", new Point(200, 10));
+                form1.panel_inventory.Controls.Add(inputCtrl);
             }
         }
         // SAVE INFO PROCESSING
@@ -92,6 +400,45 @@ namespace ShelteredSE
             saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "FamilyManager/particleTintActive"));
             form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Mystery Hatch Password" });
             saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "FamilyManager/particleTint"));
+            
+            // stored water details
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Stored Water" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "WaterManager/storedWater"));
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Max Stored Water" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "WaterManager/maxStoredWater"));
+
+            // stored food details
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Pantry Rations" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "FoodManager/rations"));
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Pantry Max Rations" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "FoodManager/maxRations"));
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Pantry Raw Meat" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "FoodManager/meat"));
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Pantry Max Meat" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "FoodManager/maxMeat"));
+
+            // oxygen & radiation
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Oxygen Level" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "EnvironmentManager/oxygenLevel"));
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Radiation Level" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "EnvironmentManager/radiationLevel"));
+
+            // Pet stats
+            if (xmlData.SelectSingleNode("Pet") != null)
+            {
+                form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Pet Dead" });
+                saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "Pet/dead"));
+                form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Pet Health" });
+                saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "Pet/health"));
+                form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Pet Hunger" });
+                saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "Pet/hunger"));
+            }
+
+            // Game Time
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Game Time Days" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "GameTime/days"));
+            form1.listView_saveInfo.Items.Add(new ListViewItem() { Text = "Game Time Hour" });
+            saveInfoMap.Add(("SaveInfo_" + counter++.ToString() + "_textbox", "GameTime/hour"));
         }
         // SAVE INFO PAINTER
         public void PaintSaveInfo(int index)
@@ -109,16 +456,30 @@ namespace ShelteredSE
             else
             {
                 var node = xmlData.SelectSingleNode(saveInfoMap[index].Path);
-                if (node.Attributes.Count > 0)
+                if (node == null)
                 {
-                    string password = node.Attributes[0].InnerText + node.Attributes[1].InnerText + node.Attributes[2].InnerText + node.Attributes[3].InnerText;
                     form1.panel_saveInfo.Controls.Add(new Label() { Text = form1.listView_saveInfo.Items[index].Text, Name = "SaveInfo_" + index.ToString() + "_label", Location = new Point(10, 10), AutoSize = true });
-                    form1.panel_saveInfo.Controls.Add(new TextBox() { Text = password, Name = "SaveInfo_" + index.ToString() + "_textbox", Location = new Point(200, 10), AutoSize = true });
+                    form1.panel_saveInfo.Controls.Add(new Label() { Text = "Not available in this save file", Name = "SaveInfo_" + index.ToString() + "_textbox", Location = new Point(200, 10), AutoSize = true, ForeColor = System.Drawing.Color.Red });
+                    return;
+                }
+
+                if (node.Attributes != null && node.Attributes.Count > 0)
+                {
+                    string password = "";
+                    foreach (XmlAttribute attr in node.Attributes)
+                    {
+                        password += attr.InnerText;
+                    }
+                    form1.panel_saveInfo.Controls.Add(new Label() { Text = form1.listView_saveInfo.Items[index].Text, Name = "SaveInfo_" + index.ToString() + "_label", Location = new Point(10, 10), AutoSize = true });
+                    var inputCtrl = CreateInputControl(password, "SaveInfo_" + index.ToString() + "_textbox", new Point(200, 10));
+                    form1.panel_saveInfo.Controls.Add(inputCtrl);
                 }
                 else
                 {
                     form1.panel_saveInfo.Controls.Add(new Label() { Text = form1.listView_saveInfo.Items[index].Text, Name = "SaveInfo_" + index.ToString() + "_label", Location = new Point(10, 10), AutoSize = true });
-                    form1.panel_saveInfo.Controls.Add(new TextBox() { Text = xmlData.SelectSingleNode(saveInfoMap[index].Path).InnerText, Name = "SaveInfo_" + index.ToString() + "_textbox", Location = new Point(200, 10), AutoSize = true });
+                    var initialValue = node.InnerText;
+                    var inputCtrl = CreateInputControl(initialValue, "SaveInfo_" + index.ToString() + "_textbox", new Point(200, 10));
+                    form1.panel_saveInfo.Controls.Add(inputCtrl);
                 }
             }
         }
@@ -258,7 +619,9 @@ namespace ShelteredSE
                     {
                         var value = xmlData.SelectSingleNode(familyMap[index].Path).Attributes[i];
                         form1.panel_character.Controls.Add(new Label() { Text = value.Name, Name = chosen + "_label", Location = new Point(10, 10 + i * 20), AutoSize = true });
-                        form1.panel_character.Controls.Add(new TextBox() { Text = ((int)Math.Floor(double.Parse(value.InnerText) * 255)).ToString(), Name = chosen + "_textbox", Location = new Point(200, 10 + i * 20), AutoSize = true });
+                        var initialValue = ((int)Math.Floor(double.Parse(value.InnerText) * 255)).ToString();
+                        var inputCtrl = CreateInputControl(initialValue, chosen + "_textbox", new Point(200, 10 + i * 20));
+                        form1.panel_character.Controls.Add(inputCtrl);
                     }
                 }
                 else if (text == "Member Trait")
@@ -271,7 +634,9 @@ namespace ShelteredSE
                 else
                 {
                     form1.panel_character.Controls.Add(new Label() { Text = text, Name = chosen + "_label", Location = new Point(10, 10), AutoSize = true });
-                    form1.panel_character.Controls.Add(new TextBox() { Text = xmlData.SelectSingleNode(familyMap[index].Path).InnerText, Name = chosen + "_textbox", Location = new Point(200, 10), AutoSize = true });
+                    var initialValue = xmlData.SelectSingleNode(familyMap[index].Path).InnerText;
+                    var inputCtrl = CreateInputControl(initialValue, chosen + "_textbox", new Point(200, 10));
+                    form1.panel_character.Controls.Add(inputCtrl);
                 }
             }
         }
@@ -297,14 +662,17 @@ namespace ShelteredSE
                         foreach (XmlNode xmlNode in xmlData.SelectSingleNode(node.FullPath).Attributes)
                         {
                             form1.panel_tree.Controls.Add(new Label() { Text = xmlNode.Name, Name = node.ToolTipText + "_label", Location = new Point(10, 10 + 30 * internalCounter), AutoSize = true });
-                            form1.panel_tree.Controls.Add(new TextBox() { Text = xmlNode.InnerText, Name = node.ToolTipText + "_textbox", Location = new Point(200, 10 + 30 * internalCounter), AutoSize = true });
+                            var inputCtrl = CreateInputControl(xmlNode.InnerText, node.ToolTipText + "_textbox", new Point(200, 10 + 30 * internalCounter));
+                            form1.panel_tree.Controls.Add(inputCtrl);
                             internalCounter += 1;
                         }
                     }
                     else
                     {
                         form1.panel_tree.Controls.Add(new Label() { Text = node.Text, Name = node.ToolTipText + "_label", Location = new Point(10, 10), AutoSize = true });
-                        form1.panel_tree.Controls.Add(new TextBox() { Text = xmlData.SelectSingleNode(node.FullPath).InnerText, Name = node.ToolTipText + "_textbox", Location = new Point(200, 10), AutoSize = true });
+                        var initialValue = xmlData.SelectSingleNode(node.FullPath).InnerText;
+                        var inputCtrl = CreateInputControl(initialValue, node.ToolTipText + "_textbox", new Point(200, 10));
+                        form1.panel_tree.Controls.Add(inputCtrl);
                     }
                 }
             }

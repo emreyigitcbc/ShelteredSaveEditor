@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -44,6 +44,7 @@ namespace ShelteredSE
                     editorSelector.Show();
                     xmlDoc.LoadXml(decodedData);
                     itemNames.Load("ItemNames.xml");
+                    ProcessData.LoadItemNames();
                     ProcessData processData = new ProcessData(this);
                     processData.StartProcess();
                 }
@@ -93,15 +94,15 @@ namespace ShelteredSE
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listView_inventory.SelectedIndices.Count <= 0)
+            if (listView_inventory.SelectedItems.Count <= 0)
             {
                 return;
             }
-            int selectedIndex = listView_inventory.SelectedIndices[0];
-            if (selectedIndex >= 0)
+            var selectedItem = listView_inventory.SelectedItems[0];
+            if (selectedItem.Tag is int originalIndex)
             {
                 ProcessData processData = new ProcessData(this);
-                processData.PaintInventoryManager(selectedIndex);
+                processData.PaintInventoryManager(originalIndex);
             }
         }
 
